@@ -9,6 +9,7 @@ func RegisterRoutes(server *gin.Engine) {
 	server.POST("/signup", signup)
 	server.POST("/login", login)
 	server.GET("/profile/:username", middlewares.Authenticate, profile)
+	server.GET("/checklogin", middlewares.Authenticate, checkLogin)
 
 	server.POST("/products", middlewares.Authenticate, createProduct)
 	server.GET("/products", middlewares.Authenticate, getProducts)

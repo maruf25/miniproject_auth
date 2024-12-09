@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import Cookies from "js-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faUnlock, faUser } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,23 +16,33 @@ const FormAuth = ({ isLogin }) => {
   const [visiblePass, setVisiblePass] = useState(false);
 
   useEffect(() => {
-    const token = Cookies.get("token");
-    if (token && isLogin) {
-      navigate("/products");
+    const checkLogin = async () => {
+      try {
+        const response = await fetch(import.meta.env.VITE_API_URL + "checklogin", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("User not logged in");
+        }
+
+        navigate("/products");
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (isLogin) {
+      checkLogin();
     }
   }, [isLogin, navigate]);
 
   const inputUsername = (e) => {
     const { name, value } = e.target;
-    const isValidUsername = /^[a-zA-Z0-9]+$/.test(value);
+    const validUsername = value.replace(/[^a-zA-Z0-9_.]+$/g, "");
 
     if (value === "") {
       setError((prevData) => ({ ...prevData, [name]: "Username cannot be empty." }));
-    } else if (!isValidUsername) {
-      setError((prevData) => ({
-        ...prevData,
-        [name]: "Username can only contain letters and numbers, without spaces or symbols.",
-      }));
     } else {
       setError((prevData) => ({
         ...prevData,
@@ -41,7 +50,7 @@ const FormAuth = ({ isLogin }) => {
       }));
     }
 
-    setInput((prevData) => ({ ...prevData, [name]: value }));
+    setInput((prevData) => ({ ...prevData, [name]: validUsername }));
   };
 
   const inputPassword = (e) => {

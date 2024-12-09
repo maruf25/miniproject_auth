@@ -115,7 +115,7 @@ func login(context *gin.Context) {
 		})
 	}
 
-	context.SetCookie("token", token, 3600*2, "/", "localhost", false, false)
+	context.SetCookie("token", token, 3600*2, "/", "localhost", false, true)
 
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Login succesfull",
@@ -140,4 +140,14 @@ func profile(context *gin.Context) {
 			"username": user.Username,
 		},
 	})
+}
+
+func checkLogin(context *gin.Context) {
+	userId := context.GetInt64("userId")
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Already Login",
+		"userId":  userId,
+	})
+
 }

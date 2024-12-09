@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import Cookies from "js-cookie";
 
 const FormProduct = () => {
   const [input, setInput] = useState({
@@ -25,10 +24,23 @@ const FormProduct = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = Cookies.get("token");
-    if (!token) {
-      navigate("/login");
-    }
+    const checkLogin = async () => {
+      try {
+        const response = await fetch(import.meta.env.VITE_API_URL + "checklogin", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          navigate("/login");
+          throw new Error("User not logged in");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    checkLogin();
   }, [navigate]);
 
   const inputText = (e) => {
